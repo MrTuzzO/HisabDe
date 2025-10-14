@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - HisabDe{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Navigation -->
+    <div class="nav-menu">
+        <div class="nav-brand">HisabDe</div>
+        <div class="nav-user">{{ user.get_short_name }}</div>
+    </div>
+    
+    <div class="profile-header">
+        <h1>Welcome, {{ user.get_short_name }}!</h1>
+        <p>Your financial dashboard</p>
+    </div>
+    
+    <div class="profile-info">
+        <!-- Dashboard Stats -->
+        <div class="profile-stats">
+            <div class="stat-card">
+                <h3>Profile</h3>
+                <p>
+                    {% if user.is_profile_complete %}
+                        <span class="text-success">✅ Complete</span>
+                    {% else %}
+                        <span class="text-warning">⚠️ Incomplete</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="stat-card">
+                <h3>Account Type</h3>
+                <p>
+                    {% if user.is_staff %}
+                        <span class="text-primary">👑 Admin</span>
+                    {% else %}
+                        <span class="text-secondary">👤 User</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="stat-card">
+                <h3>Last Login</h3>
+                <p>{{ user.last_login|date:"M d, Y" }}</p>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="mt-4">
+            <h2 class="h4 mb-3">Quick Actions</h2>
+            
+            <div class="d-grid gap-2">
+                <a href="{% url 'profile' %}" class="btn btn-primary">
+                    👤 Manage Profile
+                </a>
+                
+                <a href="{% url 'password_reset' %}" class="btn btn-secondary">
+                    🔒 Change Password
+                </a>
+                
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- User Information -->
+        <div class="mt-4 p-3 bg-light rounded">
+            <h3 class="h5 mb-3">Account Information</h3>
+            <p class="mb-2"><strong>Email:</strong> {{ user.email }}</p>
+            {% if user.full_name %}
+                <p class="mb-2"><strong>Full Name:</strong> {{ user.full_name }}</p>
+            {% endif %}
+            {% if user.mobile %}
+                <p class="mb-2"><strong>Mobile:</strong> {{ user.mobile }}</p>
+            {% endif %}
+            <p class="mb-0"><strong>Member Since:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

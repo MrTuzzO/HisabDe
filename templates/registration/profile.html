@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - HisabDe{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="profile-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="d-flex justify-content-between w-100">
+                <span class="navbar-brand">HisabDe</span>
+                <span class="nav-link">{{ user.email }}</span>
+            </div>
+        </nav>
+        
+        <div class="profile-header">
+            <h1>{{ user.get_full_name|default:user.email }}</h1>
+            <p>Manage your profile information</p>
+        </div>
+        
+        <div class="profile-card">
+            <!-- Profile Status -->
+            <div class="profile-stats mb-4">
+                <div class="stat-card">
+                    <h3>Account Status</h3>
+                    <p>{% if user.is_profile_complete %}Complete{% else %}Incomplete{% endif %}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Member Since</h3>
+                    <p>{{ user.date_joined|date:"M Y" }}</p>
+                </div>
+            </div>
+            
+            {% if not user.is_profile_complete %}
+                <div class="alert alert-warning">
+                    <strong>Complete your profile!</strong> Add your full name and mobile number to access all features.
+                </div>
+            {% endif %}
+            
+            <!-- Profile Form -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                    {{ form.email }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.full_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.mobile.id_for_label }}" class="form-label">Mobile Number</label>
+                    {{ form.mobile }}
+                    {% if form.mobile.help_text %}
+                        <div class="form-text">{{ form.mobile.help_text }}</div>
+                    {% endif %}
+                    {% if form.mobile.errors %}
+                        <div class="text-danger small mt-1">{{ form.mobile.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary mb-3">Update Profile</button>
+            </form>
+            
+            <!-- Separate buttons outside the profile form -->
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-primary flex-fill">Dashboard</a>
+                <form method="post" action="{% url 'logout' %}" class="d-inline flex-fill">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary w-100">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
