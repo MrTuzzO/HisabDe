@@ -35,10 +35,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, verbose_name='Email Address')
     full_name = models.CharField(max_length=150, blank=True, verbose_name='Full Name')
     
-    # Mobile number with validation
+    # Bangladesh mobile number validation
     mobile_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+        regex=r'^(\+88)?01[3-9]\d{8}$',
+        message="Enter a valid Bangladesh mobile number (e.g., 01712345678 or +8801712345678)"
     )
     mobile = models.CharField(
         validators=[mobile_regex], 

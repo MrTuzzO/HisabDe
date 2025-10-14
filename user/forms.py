@@ -46,7 +46,7 @@ class RegistrationForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     """Form for updating user profile"""
     full_name = forms.CharField(
-        required=True,
+        required=False,
         max_length=150,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -54,14 +54,14 @@ class UserProfileForm(forms.ModelForm):
         })
     )
     mobile = forms.CharField(
-        required=True,
+        required=False,
         max_length=17,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '+1234567890',
+            'placeholder': '01712345678',
             'type': 'tel'
         }),
-        help_text="Format: +1234567890"
+        help_text="Bangladesh mobile number (e.g., 01712345678 or +8801712345678)"
     )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={

@@ -12,7 +12,6 @@ urlpatterns = [
     
     # Profile and Dashboard
     path('profile/', views.profile_view, name='profile'),
-    path('dashboard/', views.dashboard_view, name='dashboard'),
     
     # Password Change (for logged-in users who know their current password)
     path('password_change/', 

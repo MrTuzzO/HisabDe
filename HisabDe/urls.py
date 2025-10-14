@@ -21,11 +21,17 @@ from django.shortcuts import redirect
 def home_redirect(request):
     """Redirect home to login"""
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect('hisab_dashboard')
     return redirect('login')
+
+def dashboard_redirect(request):
+    """Redirect dashboard to hisab dashboard"""
+    return redirect('hisab_dashboard')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_redirect, name='home'),
+    path('dashboard/', dashboard_redirect, name='dashboard'),
     path('auth/', include('user.urls')),
+    path('hisab/', include('hisab.urls')),
 ]

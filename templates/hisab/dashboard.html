@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - HisabDe{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first Google Keep inspired design */
+    body {
+        background-color: #f8f9fa;
+        font-size: 14px; /* Mobile base font size */
+    }
+    
+    .keep-card {
+        background: white;
+        border: 1px solid #e8eaed;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 16px;
+        padding: 16px;
+    }
+    
+    .keep-card:hover {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        transform: translateY(-2px);
+    }
+    
+    .keep-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    
+    .account-title {
+        color: #202124;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+    
+    .last-updated {
+        color: #5f6368;
+        font-size: 0.75rem;
+        font-weight: 400;
+        margin-bottom: 12px;
+    }
+    
+    .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .transaction-item:last-child {
+        border-bottom: none;
+    }
+    
+    .transaction-desc {
+        color: #202124;
+        font-size: 0.9rem;
+        font-weight: 400;
+    }
+    
+    .transaction-amount {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .amount-positive { color: #34a853; }
+    .amount-negative { color: #ea4335; }
+    
+    /* Mobile-first FAB button */
+    .fab-add {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        border: none;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .fab-add:hover {
+        background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(13,110,253,0.5);
+    }
+    
+    .fab-add:active {
+        transform: translateY(0) scale(0.95);
+    }
+    
+    @media (min-width: 768px) {
+        .fab-add {
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            font-size: 24px;
+        }
+    }
+    
+    /* Responsive masonry grid */
+    .masonry-grid {
+        column-count: 1;
+        column-gap: 20px;
+    }
+    
+    @media (min-width: 576px) {
+        .masonry-grid { 
+            column-count: 2; 
+            column-gap: 20px;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .masonry-grid { 
+            column-count: 2; 
+            column-gap: 24px;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .masonry-grid { 
+            column-count: 3; 
+            column-gap: 24px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .masonry-grid { 
+            column-count: 4; 
+            column-gap: 28px;
+        }
+    }
+    
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 16px;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .dropdown-toggle::after {
+        display: none;
+    }
+    
+    .account-actions {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .keep-card:hover .account-actions {
+        opacity: 1;
+    }
+    
+    .search-bar {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid #dadce0;
+        padding: 12px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    
+    .dashboard-content {
+        padding-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-content {
+            padding-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-content">
+    
+    <!-- Accounts Masonry Grid -->
+    {% if accounts_data %}
+    <div class="masonry-grid" id="accountsGrid">
+        {% for item in accounts_data %}
+        <div class="masonry-item">
+            <div class="keep-card" onclick="window.location.href='{% url 'account_details' item.account.id %}'">
+                <!-- Account Actions -->
+                <div class="account-actions position-absolute" style="top: 12px; right: 12px; z-index: 10;">
+                    <div class="dropdown">
+                        <button class="btn btn-sm" data-bs-toggle="dropdown" onclick="event.stopPropagation();" style="color: #5f6368;">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'account_details' item.account.id %}">
+                                <i class="fas fa-eye me-2 text-primary"></i>View Details
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'edit_account' item.account.id %}">
+                                <i class="fas fa-edit me-2 text-warning"></i>Edit Account
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'delete_account' item.account.id %}">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="p-0" style="padding: 0 !important;">
+                    <!-- Account Title -->
+                    <div class="account-title">{{ item.account.name }}</div>
+                    
+                    <!-- Last Updated -->
+                    <div class="last-updated">
+                        Updated {{ item.account.updated_at|timesince }} ago
+                    </div>
+                    
+                    <!-- Total Amount with BDT -->
+                    <div class="mb-3">
+                        <h4 class="{% if item.total >= 0 %}amount-positive{% else %}amount-negative{% endif %} mb-1" style="font-size: 1.3rem; font-weight: 600;">
+                            {% if item.total >= 0 %}+{% endif %}৳{{ item.total|floatformat:2 }}
+                        </h4>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    {% if item.transactions %}
+                    {% for tx in item.transactions %}
+                    <div class="transaction-item">
+                        <div class="flex-grow-1">
+                            <div class="transaction-desc">{{ tx.description }}</div>
+                            <small class="text-muted">{{ tx.date|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="transaction-amount {% if tx.amount >= 0 %}amount-positive{% else %}amount-negative{% endif %}">
+                            {% if tx.amount >= 0 %}+{% endif %}৳{{ tx.amount|floatformat:2 }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if item.transactions|length >= 3 %}
+                    <div class="text-center mt-2">
+                        <small class="text-primary" style="font-weight: 500;">{{ item.transactions.count }} more transaction{{ item.transactions.count|pluralize }}</small>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-2">
+                        <i class="fas fa-plus-circle text-muted mb-1" style="font-size: 1.5rem; opacity: 0.4;"></i>
+                        <p class="text-muted mb-0" style="font-size: 0.85rem;">Click to add transactions</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="keep-card d-inline-block" style="max-width: 400px;">
+            <div class="p-5">
+                <i class="fas fa-wallet text-primary mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
+                <h4 class="text-muted mb-3">Start Your Financial Journey</h4>
+                <p class="text-muted mb-4">Create your first account to begin tracking your transactions and managing your finances.</p>
+                <a href="{% url 'create_account' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Create First Account
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    </div>
+</div>
+
+<!-- Floating Action Button -->
+<button class="fab-add" onclick="window.location.href='{% url 'create_account' %}'" title="Add New Account">
+    <i class="fas fa-plus"></i>
+</button>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Google Keep style interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide messages after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
+
+    // Search functionality for both header and mobile search
+    function performSearch(searchTerm) {
+        const cards = document.querySelectorAll('.masonry-item');
+        cards.forEach(card => {
+            const accountName = card.querySelector('.account-title').textContent.toLowerCase();
+            if (accountName.includes(searchTerm.toLowerCase())) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    // Header search (desktop)
+    const headerSearch = document.getElementById('headerSearch');
+    if (headerSearch) {
+        headerSearch.addEventListener('input', function() {
+            performSearch(this.value);
+            // Sync with mobile search
+            const mobileSearch = document.getElementById('mobileSearch');
+            if (mobileSearch) mobileSearch.value = this.value;
+        });
+    }
+    
+    // Mobile search
+    const mobileSearch = document.getElementById('mobileSearch');
+    if (mobileSearch) {
+        mobileSearch.addEventListener('input', function() {
+            performSearch(this.value);
+            // Sync with header search
+            const headerSearch = document.getElementById('headerSearch');
+            if (headerSearch) headerSearch.value = this.value;
+        });
+                const accountName = card.querySelector('.account-title').textContent.toLowerCase();
+                const accountInfo = card.querySelector('.account-subtitle').textContent.toLowerCase();
+                
+                if (accountName.includes(searchTerm) || accountInfo.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

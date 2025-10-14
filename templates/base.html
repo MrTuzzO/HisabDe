@@ -8,18 +8,146 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <!-- Custom CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
+    <style>
+        /* Base styles for mobile-first design */
+        body {
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+        
+        .main-navbar {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        
+        .search-bar-header {
+            background: rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 8px 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .search-bar-header input {
+            color: white;
+        }
+        
+        .search-bar-header input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .search-bar-mobile {
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 8px 16px;
+            border: 1px solid #e8eaed;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 76px);
+            padding-bottom: 80px; /* Space for FAB */
+        }
+        
+        /* Responsive navigation */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+        
+        .message-container {
+            position: fixed;
+            top: 76px;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            padding: 0 16px;
+        }
+    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Navigation Bar -->
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg main-navbar">
+        <div class="container">
+            <div class="d-flex align-items-center w-100">
+                <!-- Brand -->
+                <a class="navbar-brand text-white me-3" href="{% url 'hisab_dashboard' %}">
+                    <i class="fas fa-wallet me-2"></i>HisabDe
+                </a>
+                
+                <!-- Search Bar (Google Keep Style) -->
+                <div class="flex-grow-1 me-3 d-none d-md-block">
+                    <div class="search-bar-header">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-search text-muted me-2"></i>
+                            <input type="text" class="form-control border-0" placeholder="Search accounts..." 
+                                   style="background: transparent; box-shadow: none;"
+                                   id="headerSearch">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Icon -->
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" style="padding: 0.5rem;">
+                        <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'password_change' %}">
+                            <i class="fas fa-lock me-2"></i>Change Password
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mobile Search Bar -->
+    <div class="mobile-search d-md-none" style="background: white; padding: 12px 16px; border-bottom: 1px solid #e8eaed;">
+        <div class="search-bar-mobile">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-search text-muted me-2"></i>
+                <input type="text" class="form-control border-0" placeholder="Search accounts..." 
+                       style="background: transparent; box-shadow: none;"
+                       id="mobileSearch">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Messages -->
     {% if messages %}
-        <div class="container mt-3">
+        <div class="message-container">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-2" role="alert" style="border-radius: 8px;">
+                    <strong>
+                        {% if message.tags == 'success' %}<i class="fas fa-check-circle me-2"></i>{% endif %}
+                        {% if message.tags == 'error' %}<i class="fas fa-exclamation-circle me-2"></i>{% endif %}
+                        {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle me-2"></i>{% endif %}
+                        {% if message.tags == 'info' %}<i class="fas fa-info-circle me-2"></i>{% endif %}
+                    </strong>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -28,10 +156,26 @@
     {% endif %}
 
     <!-- Main Content -->
-    {% block content %}{% endblock %}
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Auto-dismiss messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

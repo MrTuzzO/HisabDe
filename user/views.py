@@ -43,25 +43,13 @@ def profile_view(request):
     
     return render(request, 'registration/profile.html', {'form': form})
 
-@login_required
-def dashboard_view(request):
-    """Dashboard view"""
-    if not request.user.is_profile_complete:
-        messages.warning(
-            request, 
-            'Please complete your profile to access all features.'
-        )
-        return redirect('profile')
-    
-    return render(request, 'registration/dashboard.html')
-
 # Use Django's built-in auth views with customization
 class CustomLoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('dashboard')
+        return reverse_lazy('hisab_dashboard')
 
     def form_invalid(self, form):
         messages.error(self.request, 'Invalid email or password.')
