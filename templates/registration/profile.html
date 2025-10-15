@@ -4,27 +4,38 @@
 
 {% block extra_css %}
 <style>
-    .profile-container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
-    
     .profile-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
         background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
         color: white;
         border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+    }
+    
+    @media (min-width: 768px) {
+        .profile-header {
+            padding: 2rem;
+        }
+        
+        .profile-header h1 {
+            font-size: 1.75rem;
+        }
     }
     
     .profile-card {
         background: white;
         border-radius: 16px;
-        padding: 2rem;
+        padding: 1.5rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border: 1px solid #e8eaed;
+    }
+    
+    @media (min-width: 768px) {
+        .profile-card {
+            padding: 2rem;
+        }
     }
     
     .info-card {
@@ -67,37 +78,18 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(13,110,253,0.3);
     }
-    
-    @media (max-width: 768px) {
-        .profile-container {
-            padding: 1rem 0.5rem;
-        }
-        
-        .profile-card {
-            padding: 1.5rem;
-        }
-    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="profile-container">
-        <div class="profile-header">
-            <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">{{ user.get_full_name|default:user.email }}</h1>
-            <p class="mb-0" style="opacity: 0.9;">Manage your profile information</p>
-        </div>
-        
-        <div class="profile-card">
-            <!-- Member Since Info -->
-            <div class="profile-info mb-4">
-                <div class="info-card">
-                    <h3 class="text-muted" style="font-size: 0.9rem; font-weight: 500;">Member Since</h3>
-                    <p class="mb-0" style="font-size: 1.1rem; color: #202124;">{{ user.date_joined|date:"F Y" }}</p>
-                </div>
-            </div>
-            
-            <!-- Profile Form -->
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="profile-header">
+        <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">{{ user.get_full_name|default:user.email }}</h1>
+        <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">Manage your profile information</p>
+    </div>
+    
+    <div class="profile-card">
+        <!-- Profile Form -->
             <form method="post">
                 {% csrf_token %}
                 

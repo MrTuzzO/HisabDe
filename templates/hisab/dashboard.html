@@ -187,7 +187,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="container dashboard-content">
     
     <!-- Accounts Masonry Grid -->
     {% if accounts_data %}
@@ -275,8 +274,6 @@
         </div>
     </div>
     {% endif %}
-    </div>
-</div>
 
 <!-- Floating Action Button -->
 <button class="fab-add" onclick="window.location.href='{% url 'create_account' %}'" title="Add New Account">

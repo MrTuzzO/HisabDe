@@ -9,13 +9,9 @@
         background-color: #f8f9fa;
     }
     
-    .delete-container {
-        max-width: 500px;
-        margin: 3rem auto;
-        padding: 0 1rem;
-    }
-    
     .delete-card {
+        max-width: 500px;
+        margin: 0 auto;
         background: white;
         border-radius: 16px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.1);
@@ -158,9 +154,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="delete-container">
-    <div class="delete-card">
-        <!-- Icon and Title -->
+<div class="delete-card">
+    <!-- Icon and Title -->
         <div class="delete-icon-wrapper">
             <div class="delete-icon">
                 <i class="fas fa-trash-alt"></i>
@@ -202,5 +197,4 @@
             </form>
         </div>
     </div>
-</div>
 {% endblock %}

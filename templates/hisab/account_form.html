@@ -6,11 +6,6 @@
 {% block extra_css %}
 <style>
     
-    .form-container {
-        max-width: 800px;
-        margin: 2rem auto;
-    }
-    
     .form-card {
         background: white;
         border-radius: 16px;
@@ -22,14 +17,24 @@
     .form-header {
         background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
         color: white;
-        padding: 2rem;
+        padding: 1.5rem;
         text-align: center;
     }
     
     .form-header h2 {
-        font-weight: 500;
+        font-weight: 600;
         margin-bottom: 0.5rem;
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .form-header {
+            padding: 2rem;
+        }
+        
+        .form-header h2 {
+            font-size: 1.75rem;
+        }
     }
     
     .form-body {
@@ -97,20 +102,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="form-container">
-        <div class="form-card">
-        <!-- Header -->
-        <div class="form-header">
-            <h2>{{ title }}</h2>
-            <p class="mb-0" style="opacity: 0.9;">
-                {% if is_create %}Create a new account to start tracking your finances{% else %}Update account details and manage transactions{% endif %}
-            </p>
-        </div>
-        
-        <!-- Form Body -->
-        <div class="form-body">
-            <form method="post" novalidate>
+<div class="form-card" style="max-width: 800px; margin: 0 auto;">
+    <!-- Header -->
+    <div class="form-header">
+        <h2>{{ title }}</h2>
+        <p class="mb-0" style="opacity: 0.9;">
+            {% if is_create %}Create a new account to start tracking your finances{% else %}Update account details and manage transactions{% endif %}
+        </p>
+    </div>
+    
+    <!-- Form Body -->
+    <div class="form-body">
+        <form method="post" novalidate>
                 {% csrf_token %}
                 
                 <!-- Account Details Section -->
@@ -257,13 +260,13 @@
                         {% endif %}
                     </button>
                 </div>
-                    </form>
             </form>
-            </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 function addTransactionForm() {
     const formset = document.getElementById('transaction-formset');
@@ -307,55 +310,6 @@ function addTransactionForm() {
         formset.appendChild(newForm);
         totalForms.value = formIndex + 1;
     }
-}
-</script>
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function addTransactionForm() {
-    const formset = document.getElementById('transaction-formset');
-    const totalFormsInput = document.querySelector('[name$="-TOTAL_FORMS"]');
-    const formIndex = parseInt(totalFormsInput.value);
-    
-    // Create new form HTML (this would be better with proper Django formset JavaScript)
-    const newFormHtml = `
-        <div class="transaction-form border rounded p-3 mb-3" data-form-index="${formIndex}">
-            <div class="row align-items-end">
-                <div class="col-md-4 mb-2">
-                    <label class="form-label">Description</label>
-                    <input type="text" name="transaction_set-${formIndex}-description" class="form-control form-control-sm" placeholder="Description">
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label class="form-label">Amount</label>
-                    <input type="number" name="transaction_set-${formIndex}-amount" step="0.01" class="form-control form-control-sm" placeholder="Amount">
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="transaction_set-${formIndex}-date" class="form-control form-control-sm" value="${new Date().toISOString().split('T')[0]}">
-                </div>
-                <div class="col-md-2 mb-2">
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTransactionForm(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    formset.insertAdjacentHTML('beforeend', newFormHtml);
-    totalFormsInput.value = formIndex + 1;
-}
-
-function removeTransactionForm(button) {
-    const form = button.closest('.transaction-form');
-    form.remove();
-    
-    // Update form indices (simplified - in production you'd want proper formset management)
-    const totalFormsInput = document.querySelector('[name$="-TOTAL_FORMS"]');
-    const forms = document.querySelectorAll('.transaction-form');
-    totalFormsInput.value = forms.length;
 }
 </script>
 {% endblock %}

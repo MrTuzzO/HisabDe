@@ -2,30 +2,295 @@
 
 {% block title %}{{ account.name }} - Details{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Mobile-first professional design */
+    body {
+        background-color: #f8f9fa;
+    }
+    
+    .account-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+    }
+    
+    .section-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #5f6368;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 1.5rem 0 0.75rem;
+        padding-left: 0.5rem;
+        border-left: 3px solid #0d6efd;
+    }
+    
+    .transaction-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .transaction-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    
+    .transaction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    
+    .transaction-desc {
+        font-weight: 600;
+        color: #202124;
+        font-size: 1rem;
+        flex: 1;
+    }
+    
+    .transaction-amount {
+        font-weight: 700;
+        font-size: 1.1rem;
+        white-space: nowrap;
+        margin-left: 1rem;
+    }
+    
+    .amount-positive {
+        color: #34a853;
+    }
+    
+    .amount-negative {
+        color: #ea4335;
+    }
+    
+    .transaction-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #5f6368;
+        font-size: 0.85rem;
+    }
+    
+    .transaction-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f1f3f4;
+    }
+    
+    .btn-icon {
+        background: none;
+        border: none;
+        color: #0d6efd;
+        padding: 0.5rem;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+    }
+    
+    .btn-icon:hover {
+        background: #e7f3ff;
+        color: #0d6efd;
+    }
+    
+    .btn-icon.text-primary:hover {
+        background: #e7f3ff;
+        color: #0d6efd;
+    }
+    
+    .btn-icon.text-danger {
+        color: #dc3545;
+    }
+    
+    .btn-icon.text-danger:hover {
+        background: #ffe6e6;
+        color: #dc3545;
+    }
+    
+    .btn-icon.text-success {
+        color: #198754;
+    }
+    
+    .btn-icon.text-success:hover {
+        background: #e6f4ea;
+        color: #198754;
+    }
+    
+    .edit-form {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.75rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 0.75rem;
+    }
+    
+    .form-floating > .form-control {
+        border: 2px solid #e8eaed;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .form-floating > .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+    
+    .form-floating > label {
+        font-size: 0.85rem;
+        color: #5f6368;
+    }
+    
+    .new-transaction-card {
+        background: #f8f9fa;
+        border: 2px dashed #0d6efd;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .fab-button {
+        position: fixed;
+        bottom: 80px;
+        right: 1rem;
+        width: 56px;
+        height: 56px;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 1000;
+    }
+    
+    .fab-button:hover {
+        background: #0a58ca;
+        transform: scale(1.05);
+    }
+    
+    .action-bar {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 1rem;
+        margin: 1rem -1rem -1rem;
+        border-top: 1px solid #e8eaed;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .btn-action {
+        flex: 1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-weight: 500;
+        border: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-back {
+        background: white;
+        color: #5f6368;
+        border: 1px solid #e8eaed;
+    }
+    
+    .btn-back:hover {
+        background: #f8f9fa;
+        color: #202124;
+        border-color: #dadce0;
+    }
+    
+    .btn-save {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .btn-save:hover {
+        background: #0a58ca;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        .account-header {
+            border-radius: 12px;
+            margin: 0 0 1.5rem;
+            padding: 1.25rem;
+        }
+        
+        .transaction-card {
+            padding: 1.25rem;
+        }
+        
+        .action-bar {
+            position: static;
+            margin: 2rem 0 0;
+            border-radius: 12px;
+        }
+        
+        .fab-button {
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+        }
+    }
+    
+    /* Hide default table on mobile */
+    .table-view {
+        display: none;
+    }
+    
+    @media (min-width: 768px) {
+        .table-view {
+            display: block;
+        }
+        .card-view {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container px-3">
     <!-- Account Header -->
-    <div class="card mb-4" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white; border: none;">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-1">
-                        {{ account.name }}
-                        <a href="{% url 'edit_account' account.id %}" class="text-white ms-2" style="font-size: 0.7em; opacity: 0.8;" title="Edit Account">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </h1>
-                    <p class="mb-0 opacity-75">
-                        <i class="fas fa-envelope me-1"></i>{{ account.email|default:"No email" }}
-                        {% if account.mobile %}
-                        <span class="ms-3"><i class="fas fa-phone me-1"></i>{{ account.mobile }}</span>
-                        {% endif %}
-                    </p>
+    <div class="account-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+                <h1 class="h5 mb-1">
+                    {{ account.name }}
+                    <a href="{% url 'edit_account' account.id %}" class="text-white ms-2" style="font-size: 0.8em; opacity: 0.9;">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </h1>
+                <div class="small opacity-90">
+                    {% if account.email %}<i class="fas fa-envelope me-1"></i>{{ account.email }}{% endif %}
+                    {% if account.email and account.mobile %}<br class="d-md-none"> • {% endif %}
+                    {% if account.mobile %}<i class="fas fa-phone me-1"></i>{{ account.mobile }}{% endif %}
                 </div>
-                <div class="text-end">
-                    <div class="h2 mb-0">৳{{ total|floatformat:2 }}</div>
-                    <small class="opacity-75">Total Balance</small>
-                </div>
+            </div>
+            
+            <div class="text-end ms-3">
+                <div class="small opacity-75">Balance</div>
+                <div class="h5 mb-0 fw-bold">৳{{ total|floatformat:2 }}</div>
             </div>
         </div>
     </div>
@@ -35,122 +300,74 @@
         {% csrf_token %}
         {{ transaction_formset.management_form }}
 
-        <!-- Saved Transactions Table -->
-        <div class="card mb-3">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless mb-0">
-                        <thead class="border-bottom">
-                            <tr class="text-muted small text-uppercase">
-                                <th class="ps-3" style="width: 60%;">Description</th>
-                                <th style="width: 10%;">Amount</th>
-                                <th style="width: 15%;">Date</th>
-                                <th class="text-center pe-3" style="width: 15%;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="saved-transactions">
-                            {% for form in transaction_formset %}
-                                {% if form.instance.pk %}
-                                <tr class="transaction-row" data-form-index="{{ forloop.counter0 }}" data-mode="view">
-                                    {% for hidden in form.hidden_fields %}
-                                        {{ hidden }}
-                                    {% endfor %}
-                                    
-                                    <!-- View Mode -->
-                                    <td class="ps-3 view-mode">
-                                        <span class="view-value">{{ form.instance.description }}</span>
-                                        <div class="edit-mode d-none">
-                                            {{ form.description }}
-                                        </div>
-                                    </td>
-                                    <td class="view-mode">
-                                        <span class="view-value">৳{{ form.instance.amount }}</span>
-                                        <div class="edit-mode d-none">
-                                            {{ form.amount }}
-                                        </div>
-                                    </td>
-                                    <td class="view-mode">
-                                        <span class="view-value">{{ form.instance.date|date:"M d, Y" }}</span>
-                                        <div class="edit-mode d-none">
-                                            {{ form.date }}
-                                        </div>
-                                    </td>
-                                    <td class="text-center pe-3">
-                                        <div class="d-flex justify-content-center align-items-center gap-1">
-                                            <button type="button" class="btn btn-sm btn-link text-primary edit-btn p-1" onclick="editTransaction(this)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-link text-success save-btn d-none p-1" onclick="saveEditTransaction(this)">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-link text-secondary cancel-btn d-none p-1" onclick="cancelEditTransaction(this)">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                            {% if form.DELETE %}
-                                                {{ form.DELETE }}
-                                                <label class="mb-0 ms-1" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
-                                                    <i class="fas fa-trash text-danger" title="Delete"></i>
-                                                </label>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <!-- Section Title -->
+        {% if transaction_formset %}
+            <div class="section-title">Saved Transactions</div>
+        {% endif %}
 
-        <!-- New Transactions (Input Fields) -->
-        <div id="transaction-formset">
+        <!-- Card View for Mobile -->
+        <div class="card-view" id="saved-transactions-cards">
             {% for form in transaction_formset %}
-                {% if not form.instance.pk %}
-                <div class="card mb-3" data-form-index="{{ forloop.counter0 }}" data-mode="edit">
-                    <div class="card-body">
-                        {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-                        
-                        <div class="row align-items-end">
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    {{ form.description }}
-                                    <label for="{{ form.description.id_for_label }}">Description</label>
-                                </div>
-                                {% if form.description.errors %}
-                                    <div class="text-danger small">{{ form.description.errors.0 }}</div>
-                                {% endif %}
+                {% if form.instance.pk %}
+                <div class="transaction-card" data-form-index="{{ forloop.counter0 }}" data-mode="view">
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    
+                    <!-- View Mode -->
+                    <div class="view-mode">
+                        <div class="transaction-header">
+                            <div class="transaction-desc view-value">{{ form.instance.description }}</div>
+                            <div class="transaction-amount {% if form.instance.amount < 0 %}amount-negative{% else %}amount-positive{% endif %} view-value">
+                                {% if form.instance.amount >= 0 %}+{% endif %}৳{{ form.instance.amount|floatformat:2 }}
                             </div>
-                            
-                            <div class="col-md-3 mt-3 mt-md-0">
-                                <div class="form-floating">
-                                    {{ form.amount }}
-                                    <label for="{{ form.amount.id_for_label }}">Amount (৳)</label>
-                                </div>
-                                {% if form.amount.errors %}
-                                    <div class="text-danger small">{{ form.amount.errors.0 }}</div>
-                                {% endif %}
+                        </div>
+                        <div class="transaction-meta">
+                            <span class="view-value">
+                                <i class="fas fa-calendar-alt me-1"></i>{{ form.instance.date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        <div class="transaction-actions">
+                            <button type="button" class="btn-icon text-primary edit-btn" onclick="editTransactionCard(this)">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            {% if form.DELETE %}
+                                {{ form.DELETE }}
+                                <label class="btn-icon text-danger mb-0" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
+                                    <i class="fas fa-trash"></i> Delete
+                                </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Edit Mode -->
+                    <div class="edit-mode d-none">
+                        <div class="edit-form">
+                            <div class="form-floating">
+                                {{ form.description }}
+                                <label for="{{ form.description.id_for_label }}">Description</label>
                             </div>
-                            
-                            <div class="col-md-3 mt-3 mt-md-0">
-                                <div class="form-floating">
-                                    {{ form.date }}
-                                    <label for="{{ form.date.id_for_label }}">Date</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        {{ form.amount }}
+                                        <label for="{{ form.amount.id_for_label }}">Amount (৳)</label>
+                                    </div>
                                 </div>
-                                {% if form.date.errors %}
-                                    <div class="text-danger small">{{ form.date.errors.0 }}</div>
-                                {% endif %}
+                                <div class="col-6">
+                                    <div class="form-floating">
+                                        {{ form.date }}
+                                        <label for="{{ form.date.id_for_label }}">Date</label>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="col-md-2 text-center mt-3 mt-md-0">
-                                {% if form.DELETE %}
-                                    {{ form.DELETE }}
-                                    <label class="ms-1 d-inline" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
-                                        <i class="fas fa-trash text-danger" title="Delete"></i>
-                                    </label>
-                                {% endif %}
+                            <div class="d-flex gap-2 mt-2">
+                                <button type="button" class="btn btn-sm btn-success save-btn" onclick="saveEditTransactionCard(this)">
+                                    <i class="fas fa-check me-1"></i>Save
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary cancel-btn" onclick="cancelEditTransactionCard(this)">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -159,43 +376,167 @@
             {% endfor %}
         </div>
 
-        <!-- Add More Transactions Button -->
-        <div class="text-center mb-3">
-            <button type="button" class="btn btn-outline-primary" onclick="addTransactionForm()">
-                <i class="fas fa-plus me-2"></i> Add Transaction
-            </button>
+        <!-- Table View for Desktop (keeping original) -->
+        <div class="table-view">
+            <div class="card mb-3">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <thead class="border-bottom">
+                                <tr class="text-muted small text-uppercase">
+                                    <th class="ps-3" style="width: 60%;">Description</th>
+                                    <th style="width: 10%;">Amount</th>
+                                    <th style="width: 15%;">Date</th>
+                                    <th class="text-center pe-3" style="width: 15%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="saved-transactions">
+                                {% for form in transaction_formset %}
+                                    {% if form.instance.pk %}
+                                    <tr class="transaction-row" data-form-index="{{ forloop.counter0 }}" data-mode="view">
+                                        {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                        
+                                        <!-- View Mode -->
+                                        <td class="ps-3 view-mode">
+                                            <span class="view-value">{{ form.instance.description }}</span>
+                                            <div class="edit-mode d-none">
+                                                {{ form.description }}
+                                            </div>
+                                        </td>
+                                        <td class="view-mode">
+                                            <span class="view-value">৳{{ form.instance.amount }}</span>
+                                            <div class="edit-mode d-none">
+                                                {{ form.amount }}
+                                            </div>
+                                        </td>
+                                        <td class="view-mode">
+                                            <span class="view-value">{{ form.instance.date|date:"M d, Y" }}</span>
+                                            <div class="edit-mode d-none">
+                                                {{ form.date }}
+                                            </div>
+                                        </td>
+                                        <td class="text-center pe-3">
+                                            <div class="d-flex justify-content-center align-items-center gap-1">
+                                                <button type="button" class="btn btn-sm btn-link text-primary edit-btn p-1" onclick="editTransaction(this)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-link text-success save-btn d-none p-1" onclick="saveEditTransaction(this)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-link text-secondary cancel-btn d-none p-1" onclick="cancelEditTransaction(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                {% if form.DELETE %}
+                                                    {{ form.DELETE }}
+                                                    <label class="mb-0 ms-1" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
+                                                        <i class="fas fa-trash text-danger" title="Delete"></i>
+                                                    </label>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- New Transactions -->
+        {% if transaction_formset %}
+            <div class="section-title">New Transactions</div>
+        {% endif %}
+        
+        <div id="transaction-formset">
+            {% for form in transaction_formset %}
+                {% if not form.instance.pk %}
+                <div class="new-transaction-card" data-form-index="{{ forloop.counter0 }}" data-mode="edit">
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                {{ form.description }}
+                                <label for="{{ form.description.id_for_label }}">Description</label>
+                            </div>
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="form-floating">
+                                {{ form.amount }}
+                                <label for="{{ form.amount.id_for_label }}">Amount (৳)</label>
+                            </div>
+                            {% if form.amount.errors %}
+                                <div class="text-danger small">{{ form.amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="form-floating">
+                                {{ form.date }}
+                                <label for="{{ form.date.id_for_label }}">Date</label>
+                            </div>
+                            {% if form.date.errors %}
+                                <div class="text-danger small">{{ form.date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if form.DELETE %}
+                        <div class="col-12 text-end">
+                            {{ form.DELETE }}
+                            <label class="btn-icon text-danger d-inline-flex align-items-center" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
+                                <i class="fas fa-trash me-1"></i> Remove
+                            </label>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- FAB Add Button -->
+        <button type="button" class="fab-button" onclick="addTransactionForm()" title="Add Transaction">
+            <i class="fas fa-plus"></i>
+        </button>
 
         {% with empty_form=transaction_formset.empty_form %}
         <script type="text/template" id="transaction-empty-form">
-            <div class="card mb-3 transaction-form-card" data-form-index="__prefix__" data-mode="edit">
-                <div class="card-body">
-                    {% for hidden in empty_form.hidden_fields %}
-                        {{ hidden }}
-                    {% endfor %}
-                    <div class="row align-items-end">
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                {{ empty_form.description }}
-                                <label for="{{ empty_form.description.id_for_label }}">Description</label>
-                            </div>
+            <div class="new-transaction-card" data-form-index="__prefix__" data-mode="edit">
+                {% for hidden in empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+                <div class="row g-2">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            {{ empty_form.description }}
+                            <label for="{{ empty_form.description.id_for_label }}">Description</label>
                         </div>
-                        <div class="col-md-3 mt-3 mt-md-0">
-                            <div class="form-floating">
-                                {{ empty_form.amount }}
-                                <label for="{{ empty_form.amount.id_for_label }}">Amount (৳)</label>
-                            </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            {{ empty_form.amount }}
+                            <label for="{{ empty_form.amount.id_for_label }}">Amount (৳)</label>
                         </div>
-                        <div class="col-md-3 mt-3 mt-md-0">
-                            <div class="form-floating">
-                                {{ empty_form.date }}
-                                <label for="{{ empty_form.date.id_for_label }}">Date</label>
-                            </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            {{ empty_form.date }}
+                            <label for="{{ empty_form.date.id_for_label }}">Date</label>
                         </div>
-                        <div class="col-md-2 text-center mt-3 mt-md-0">
-                            <div class="d-none">
-                                {{ empty_form.DELETE }}
-                            </div>
+                    </div>
+                    <div class="col-12 text-end">
+                        <div class="d-none">
+                            {{ empty_form.DELETE }}
                         </div>
                     </div>
                 </div>
@@ -203,79 +544,88 @@
         </script>
         {% endwith %}
 
-        <!-- Save Button -->
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <a href="{% url 'hisab_dashboard' %}" class="btn btn-outline-secondary">
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <a href="{% url 'hisab_dashboard' %}" class="btn btn-action btn-back">
                 <i class="fas fa-arrow-left me-1"></i>Back
             </a>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-action btn-save">
                 <i class="fas fa-save me-1"></i>Save Changes
             </button>
         </div>
     </form>
-</div>
 {% endblock %}
 
 {% block extra_js %}
-<style>
-    .table tbody tr {
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .table tbody tr:last-child {
-        border-bottom: none;
-    }
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-    .edit-mode input, .edit-mode select {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-    }
-    .edit-mode input[name*="-description"] {
-        width: 100%;
-    }
-    .edit-mode input[name*="-amount"] {
-        width: 100px;
-    }
-    .edit-mode input[name*="-date"] {
-        width: 140px;
-    }
-</style>
 <script>
+// Add Transaction Form
 function addTransactionForm() {
     const formset = document.getElementById('transaction-formset');
     const totalForms = document.getElementById('id_{{ transaction_formset.prefix }}-TOTAL_FORMS');
     const formIndex = parseInt(totalForms.value);
     
-    // Get the template and replace __prefix__ with the actual form index
     const template = document.getElementById('transaction-empty-form');
     if (template) {
         const newFormHtml = template.innerHTML.replace(/__prefix__/g, formIndex);
-        
-        // Create a temporary container to parse the HTML
         const temp = document.createElement('div');
         temp.innerHTML = newFormHtml;
         const newForm = temp.firstElementChild;
-        
-        // Append the new form to the formset
         formset.appendChild(newForm);
-        
-        // Update the total forms count
         totalForms.value = formIndex + 1;
+        
+        // Scroll to new form
+        newForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
 
+// Card View Edit Functions (Mobile)
+function editTransactionCard(button) {
+    const card = button.closest('.transaction-card');
+    card.setAttribute('data-mode', 'edit');
+    card.querySelector('.view-mode').classList.add('d-none');
+    card.querySelector('.edit-mode').classList.remove('d-none');
+}
+
+function saveEditTransactionCard(button) {
+    const card = button.closest('.transaction-card');
+    card.setAttribute('data-mode', 'view');
+    
+    const descInput = card.querySelector('input[name*="-description"]');
+    const amountInput = card.querySelector('input[name*="-amount"]');
+    const dateInput = card.querySelector('input[name*="-date"]');
+    
+    const descView = card.querySelector('.transaction-desc.view-value');
+    const amountView = card.querySelector('.transaction-amount.view-value');
+    const dateView = card.querySelector('.transaction-meta .view-value');
+    
+    if (descInput && descView) descView.textContent = descInput.value;
+    if (amountInput && amountView) {
+        const amount = parseFloat(amountInput.value);
+        amountView.textContent = (amount >= 0 ? '+' : '') + '৳' + Math.abs(amount).toFixed(2);
+        amountView.className = amount < 0 ? 'transaction-amount amount-negative view-value' : 'transaction-amount amount-positive view-value';
+    }
+    if (dateInput && dateView) {
+        const date = new Date(dateInput.value);
+        dateView.innerHTML = '<i class="fas fa-calendar-alt me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    
+    card.querySelector('.view-mode').classList.remove('d-none');
+    card.querySelector('.edit-mode').classList.add('d-none');
+}
+
+function cancelEditTransactionCard(button) {
+    const card = button.closest('.transaction-card');
+    card.setAttribute('data-mode', 'view');
+    card.querySelector('.view-mode').classList.remove('d-none');
+    card.querySelector('.edit-mode').classList.add('d-none');
+}
+
+// Table View Edit Functions (Desktop) - Original Logic
 function editTransaction(button) {
     const row = button.closest('tr');
     row.setAttribute('data-mode', 'edit');
-    
-    // Hide view values and show edit inputs
     row.querySelectorAll('.view-value').forEach(el => el.classList.add('d-none'));
     row.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('d-none'));
-    
-    // Toggle buttons
     row.querySelector('.edit-btn').classList.add('d-none');
     row.querySelector('.save-btn').classList.remove('d-none');
     row.querySelector('.cancel-btn').classList.remove('d-none');
@@ -285,7 +635,6 @@ function saveEditTransaction(button) {
     const row = button.closest('tr');
     row.setAttribute('data-mode', 'view');
     
-    // Update view values from inputs
     const descInput = row.querySelector('input[name*="-description"]');
     const amountInput = row.querySelector('input[name*="-amount"]');
     const dateInput = row.querySelector('input[name*="-date"]');
@@ -301,11 +650,8 @@ function saveEditTransaction(button) {
         dateView.textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
     
-    // Hide edit inputs and show view values
     row.querySelectorAll('.view-value').forEach(el => el.classList.remove('d-none'));
     row.querySelectorAll('.edit-mode').forEach(el => el.classList.add('d-none'));
-    
-    // Toggle buttons
     row.querySelector('.edit-btn').classList.remove('d-none');
     row.querySelector('.save-btn').classList.add('d-none');
     row.querySelector('.cancel-btn').classList.add('d-none');
@@ -314,12 +660,8 @@ function saveEditTransaction(button) {
 function cancelEditTransaction(button) {
     const row = button.closest('tr');
     row.setAttribute('data-mode', 'view');
-    
-    // Hide edit inputs and show view values
     row.querySelectorAll('.view-value').forEach(el => el.classList.remove('d-none'));
     row.querySelectorAll('.edit-mode').forEach(el => el.classList.add('d-none'));
-    
-    // Toggle buttons
     row.querySelector('.edit-btn').classList.remove('d-none');
     row.querySelector('.save-btn').classList.add('d-none');
     row.querySelector('.cancel-btn').classList.add('d-none');
