@@ -1,4 +1,14 @@
 from pathlib import Path
+import os
+
+# Load environment variables from .env if django-environ is installed
+try:
+    import environ
+    env = environ.Env()
+    # read .env file, if it exists
+    environ.Env.read_env(os.path.join(Path(__file__).resolve().parent.parent, '.env'))
+except Exception:
+    env = None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -124,16 +134,14 @@ LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/auth/dashboard/'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
-# Email Backend (for development - use console backend)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# For production, use SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your-email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'your-password'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 # Password Reset Token Timeout (1 hour)
 PASSWORD_RESET_TIMEOUT = 3600
