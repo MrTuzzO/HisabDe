@@ -166,7 +166,7 @@
     }
     
     .account-actions {
-        opacity: 0;
+        opacity: 1;
         transition: opacity 0.2s ease;
     }
     
@@ -182,16 +182,7 @@
         margin-bottom: 24px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
-    
-    .dashboard-content {
-        padding-top: 2rem;
-    }
-    
-    @media (max-width: 768px) {
-        .dashboard-content {
-            padding-top: 1rem;
-        }
-    }
+
 </style>
 {% endblock %}
 
@@ -215,7 +206,7 @@
                                 <i class="fas fa-eye me-2 text-primary"></i>View Details
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'edit_account' item.account.id %}">
-                                <i class="fas fa-edit me-2 text-warning"></i>Edit Account
+                                <i class="fas fa-edit me-2 text-primary"></i>Edit Account
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'delete_account' item.account.id %}">
@@ -247,7 +238,6 @@
                     <div class="transaction-item">
                         <div class="flex-grow-1">
                             <div class="transaction-desc">{{ tx.description }}</div>
-                            <small class="text-muted">{{ tx.date|date:"M d, Y" }}</small>
                         </div>
                         <div class="transaction-amount {% if tx.amount >= 0 %}amount-positive{% else %}amount-negative{% endif %}">
                             {% if tx.amount >= 0 %}+{% endif %}৳{{ tx.amount|floatformat:2 }}

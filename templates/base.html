@@ -34,14 +34,18 @@
         
         .search-bar-header {
             background: rgba(255,255,255,0.2);
-            border-radius: 24px;
-            padding: 8px 16px;
+            border-radius: 20px;
+            padding: 4px 12px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.3);
+            max-width: 600px;
+            margin: auto;
         }
         
         .search-bar-header input {
             color: white;
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
         }
         
         .search-bar-header input::placeholder {
@@ -50,9 +54,14 @@
         
         .search-bar-mobile {
             background: #f8f9fa;
-            border-radius: 24px;
-            padding: 8px 16px;
+            border-radius: 20px;
+            padding: 4px 12px;
             border: 1px solid #e8eaed;
+        }
+        
+        .search-bar-mobile input {
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
         }
         
         .main-content {
@@ -86,18 +95,28 @@
         <div class="container">
             <div class="d-flex align-items-center w-100">
                 <!-- Brand -->
-                <a class="navbar-brand text-white me-3" href="{% url 'hisab_dashboard' %}">
-                    <i class="fas fa-wallet me-2"></i>HisabDe
+                <a class="navbar-brand text-white me-2 me-md-3" href="{% url 'hisab_dashboard' %}">
+                    <i class="fas fa-wallet me-1 me-md-2"></i><span class="d-none d-sm-inline">HisabDe</span>
                 </a>
                 
-                <!-- Search Bar (Google Keep Style) -->
-                <div class="flex-grow-1 me-3 d-none d-md-block">
-                    <div class="search-bar-header">
+                <!-- Search Bar (Responsive) -->
+                <div class="flex-grow-1 me-2 me-md-3">
+                    <div class="search-bar-header d-none d-sm-block">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-search text-muted me-2"></i>
                             <input type="text" class="form-control border-0" placeholder="Search accounts..." 
                                    style="background: transparent; box-shadow: none;"
                                    id="headerSearch">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Overall Balance (Compact) -->
+                <div class="me-2 me-md-3">
+                    <div class="text-white text-end">
+                        <div class="small opacity-75 d-none d-md-block">Balance</div>
+                        <div class="fw-bold" style="font-size: 0.95rem;">
+                            ৳{{ overall_total|floatformat:0 }}
                         </div>
                     </div>
                 </div>
@@ -124,8 +143,8 @@
         </div>
     </nav>
     
-    <!-- Mobile Search Bar -->
-    <div class="mobile-search d-md-none" style="background: white; padding: 12px 16px; border-bottom: 1px solid #e8eaed;">
+    <!-- Mobile Search Bar (Only show on extra small devices where search is hidden in navbar) -->
+    <div class="mobile-search d-sm-none" style="background: white; padding: 8px 16px; border-bottom: 1px solid #e8eaed;">
         <div class="search-bar-mobile">
             <div class="d-flex align-items-center">
                 <i class="fas fa-search text-muted me-2"></i>
@@ -156,7 +175,7 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content py-5">
         {% block content %}{% endblock %}
     </main>
 

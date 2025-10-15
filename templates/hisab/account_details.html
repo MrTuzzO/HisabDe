@@ -9,7 +9,12 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="h3 mb-1">{{ account.name }}</h1>
+                    <h1 class="h3 mb-1">
+                        {{ account.name }}
+                        <a href="{% url 'edit_account' account.id %}" class="text-white ms-2" style="font-size: 0.7em; opacity: 0.8;" title="Edit Account">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </h1>
                     <p class="mb-0 opacity-75">
                         <i class="fas fa-envelope me-1"></i>{{ account.email|default:"No email" }}
                         {% if account.mobile %}
@@ -81,11 +86,11 @@
                                             <button type="button" class="btn btn-sm btn-link text-secondary cancel-btn d-none p-1" onclick="cancelEditTransaction(this)">
                                                 <i class="fas fa-times"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-link text-danger p-1" onclick="removeTransactionForm(this)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
                                             {% if form.DELETE %}
-                                                <div class="d-none">{{ form.DELETE }}</div>
+                                                {{ form.DELETE }}
+                                                <label class="mb-0 ms-1" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
+                                                    <i class="fas fa-trash text-danger" title="Delete"></i>
+                                                </label>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -119,7 +124,7 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-3">
+                            <div class="col-md-3 mt-3 mt-md-0">
                                 <div class="form-floating">
                                     {{ form.amount }}
                                     <label for="{{ form.amount.id_for_label }}">Amount (৳)</label>
@@ -129,7 +134,7 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-3">
+                            <div class="col-md-3 mt-3 mt-md-0">
                                 <div class="form-floating">
                                     {{ form.date }}
                                     <label for="{{ form.date.id_for_label }}">Date</label>
@@ -139,13 +144,13 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-2 text-center">
+                            <div class="col-md-2 text-center mt-3 mt-md-0">
                                 {% if form.DELETE %}
-                                    <div class="d-none">{{ form.DELETE }}</div>
+                                    {{ form.DELETE }}
+                                    <label class="ms-1 d-inline" for="{{ form.DELETE.id_for_label }}" style="cursor: pointer;">
+                                        <i class="fas fa-trash text-danger" title="Delete"></i>
+                                    </label>
                                 {% endif %}
-                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTransactionForm(this)">
-                                    <i class="fas fa-times"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -175,25 +180,22 @@
                                 <label for="{{ empty_form.description.id_for_label }}">Description</label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 mt-3 mt-md-0">
                             <div class="form-floating">
                                 {{ empty_form.amount }}
                                 <label for="{{ empty_form.amount.id_for_label }}">Amount (৳)</label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 mt-3 mt-md-0">
                             <div class="form-floating">
                                 {{ empty_form.date }}
                                 <label for="{{ empty_form.date.id_for_label }}">Date</label>
                             </div>
                         </div>
-                        <div class="col-md-2 text-center">
+                        <div class="col-md-2 text-center mt-3 mt-md-0">
                             <div class="d-none">
                                 {{ empty_form.DELETE }}
                             </div>
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTransactionForm(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -244,17 +246,25 @@
 <script>
 function addTransactionForm() {
     const formset = document.getElementById('transaction-formset');
-    const totalFormsInput = document.getElementById('id_{{ transaction_formset.prefix }}-TOTAL_FORMS');
+    const totalForms = document.getElementById('id_{{ transaction_formset.prefix }}-TOTAL_FORMS');
+    const formIndex = parseInt(totalForms.value);
+    
+    // Get the template and replace __prefix__ with the actual form index
     const template = document.getElementById('transaction-empty-form');
-    if (!formset || !totalFormsInput || !template) {
-        console.error('Transaction formset template is missing.');
-        return;
+    if (template) {
+        const newFormHtml = template.innerHTML.replace(/__prefix__/g, formIndex);
+        
+        // Create a temporary container to parse the HTML
+        const temp = document.createElement('div');
+        temp.innerHTML = newFormHtml;
+        const newForm = temp.firstElementChild;
+        
+        // Append the new form to the formset
+        formset.appendChild(newForm);
+        
+        // Update the total forms count
+        totalForms.value = formIndex + 1;
     }
-
-    const formIndex = parseInt(totalFormsInput.value, 10);
-    const formHtml = template.innerHTML.replace(/__prefix__/g, formIndex);
-    formset.insertAdjacentHTML('beforeend', formHtml);
-    resequenceForms();
 }
 
 function editTransaction(button) {
@@ -313,85 +323,6 @@ function cancelEditTransaction(button) {
     row.querySelector('.edit-btn').classList.remove('d-none');
     row.querySelector('.save-btn').classList.add('d-none');
     row.querySelector('.cancel-btn').classList.add('d-none');
-}
-
-function removeTransactionForm(button) {
-    const card = button.closest('.card');
-    const row = button.closest('tr');
-    const element = card || row;
-    
-    if (!element) {
-        console.error('No element found');
-        return;
-    }
-
-    const deleteCheckbox = element.querySelector('input[type="checkbox"][name$="-DELETE"]');
-    const idField = element.querySelector('input[type="hidden"][name$="-id"]');
-    
-    if (idField && idField.value) {
-        // Saved transaction - mark for deletion and hide
-        if (deleteCheckbox) {
-            deleteCheckbox.checked = true;
-            console.log('Marked for deletion:', idField.value);
-        }
-        // Hide the row visually with inline style (more reliable than class)
-        element.style.display = 'none';
-    } else {
-        // New transaction - completely remove from DOM
-        console.log('Removing new transaction');
-        element.remove();
-        // Only resequence after removing new transactions
-        resequenceForms();
-    }
-}
-
-function resequenceForms() {
-    const cards = document.querySelectorAll('#transaction-formset .card');
-    const rows = document.querySelectorAll('#saved-transactions .transaction-row');
-    const totalFormsInput = document.getElementById('id_{{ transaction_formset.prefix }}-TOTAL_FORMS');
-
-    let index = 0;
-    
-    // Resequence saved transactions (rows)
-    rows.forEach((row) => {
-        row.setAttribute('data-form-index', index);
-        updateFormIndices(row, index);
-        index++;
-    });
-    
-    // Resequence new transactions (cards)
-    cards.forEach((card) => {
-        card.setAttribute('data-form-index', index);
-        updateFormIndices(card, index);
-        index++;
-    });
-
-    if (totalFormsInput) {
-        totalFormsInput.value = index;
-    }
-}
-
-function updateFormIndices(element, index) {
-    const inputs = element.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        const name = input.getAttribute('name');
-        if (name && name.includes('-')) {
-            input.name = name.replace(/-\d+-/, `-${index}-`);
-        }
-
-        const id = input.getAttribute('id');
-        if (id && id.includes('-')) {
-            input.id = id.replace(/-\d+-/, `-${index}-`);
-        }
-    });
-
-    const labels = element.querySelectorAll('label');
-    labels.forEach(label => {
-        const forAttr = label.getAttribute('for');
-        if (forAttr && forAttr.includes('-')) {
-            label.setAttribute('for', forAttr.replace(/-\d+-/, `-${index}-`));
-        }
-    });
 }
 
 // Auto-hide messages

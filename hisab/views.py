@@ -21,10 +21,14 @@ def dashboard_view(request):
     
     # Calculate totals for each account
     accounts_data = []
+    overall_total = 0
+    
     for account in accounts:
         total = Transaction.objects.filter(account=account).aggregate(
             total=Sum('amount')
         )['total'] or 0
+        
+        overall_total += total
         
         accounts_data.append({
             'account': account,
@@ -33,7 +37,8 @@ def dashboard_view(request):
         })
 
     context = {
-        'accounts_data': accounts_data
+        'accounts_data': accounts_data,
+        'overall_total': overall_total
     }
     return render(request, 'hisab/dashboard.html', context)
 
@@ -42,6 +47,8 @@ def create_account(request):
     """Create new account with transactions using forms"""
     if request.method == 'POST':
         account_form = AccountForm(request.POST)
+        formset = TransactionFormSet(request.POST, queryset=Transaction.objects.none())
+        
         if account_form.is_valid():
             account = account_form.save(commit=False)
             account.user = request.user
@@ -60,8 +67,9 @@ def create_account(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         account_form = AccountForm()
-        # For create, show one empty transaction form (optional)
-        formset = TransactionFormSet(extra=1)
+        # Create an empty formset (no instance yet)
+        # Since we can't pass extra=1 in Django 5.x, we use queryset=None
+        formset = TransactionFormSet(queryset=Transaction.objects.none())
 
     context = {
         'account_form': account_form,

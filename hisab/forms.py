@@ -58,6 +58,6 @@ TransactionFormSet = inlineformset_factory(
     Account, 
     Transaction,
     form=TransactionForm,
-    extra=0,  # No extra forms by default (can be overridden in views)
+    extra=1,  # Show 1 empty form by default
     can_delete=True  # Allow deletion of transactions
 )
