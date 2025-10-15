@@ -19,7 +19,7 @@
         transition: all 0.3s cubic-bezier(.25,.8,.25,1);
         cursor: pointer;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         margin-bottom: 16px;
         padding: 16px;
     }
@@ -27,16 +27,6 @@
     .keep-card:hover {
         box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
         transform: translateY(-2px);
-    }
-    
-    .keep-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%);
     }
     
     .account-title {
@@ -174,6 +164,21 @@
         opacity: 1;
     }
     
+    /* Ensure dropdown menu is always visible */
+    .account-actions .dropdown-menu {
+        z-index: 1050 !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .masonry-item {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .masonry-item:has(.dropdown.show) {
+        z-index: 1051;
+    }
+    
     .search-bar {
         background: white;
         border-radius: 24px;
@@ -193,7 +198,7 @@
     <div class="masonry-grid" id="accountsGrid">
         {% for item in accounts_data %}
         <div class="masonry-item">
-            <div class="keep-card" onclick="window.location.href='{% url 'account_details' item.account.id %}'">
+            <div class="keep-card" data-account-url="{% url 'account_details' item.account.id %}" role="button" tabindex="0">
                 <!-- Account Actions -->
                 <div class="account-actions position-absolute" style="top: 12px; right: 12px; z-index: 10;">
                     <div class="dropdown">
@@ -276,7 +281,7 @@
     {% endif %}
 
 <!-- Floating Action Button -->
-<button class="fab-add" onclick="window.location.href='{% url 'create_account' %}'" title="Add New Account">
+<button class="fab-add" data-create-url="{% url 'create_account' %}" title="Add New Account">
     <i class="fas fa-plus"></i>
 </button>
 {% endblock %}
@@ -285,6 +290,31 @@
 <script>
 // Google Keep style interactions
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle card clicks
+    document.querySelectorAll('.keep-card[data-account-url]').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't navigate if clicking on dropdown or its children
+            if (!e.target.closest('.account-actions')) {
+                window.location.href = this.dataset.accountUrl;
+            }
+        });
+        
+        // Add keyboard support
+        card.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.target.closest('.account-actions')) {
+                window.location.href = this.dataset.accountUrl;
+            }
+        });
+    });
+    
+    // Handle FAB button click
+    const fabButton = document.querySelector('.fab-add[data-create-url]');
+    if (fabButton) {
+        fabButton.addEventListener('click', function() {
+            window.location.href = this.dataset.createUrl;
+        });
+    }
+    
     // Auto-hide messages after 5 seconds
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -295,48 +325,75 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Search functionality for both header and mobile search
+    // Search functionality - Filter accounts by name only
     function performSearch(searchTerm) {
         const cards = document.querySelectorAll('.masonry-item');
+        const searchLower = searchTerm.toLowerCase().trim();
+        let visibleCount = 0;
+        
         cards.forEach(card => {
-            const accountName = card.querySelector('.account-title').textContent.toLowerCase();
-            if (accountName.includes(searchTerm.toLowerCase())) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
+            const accountNameElement = card.querySelector('.account-title');
+            if (accountNameElement) {
+                const accountName = accountNameElement.textContent.toLowerCase();
+                
+                if (searchLower === '' || accountName.includes(searchLower)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
             }
         });
+        
+        // Show/hide "no results" message
+        showNoResults(visibleCount === 0 && searchLower !== '');
     }
     
-    // Header search (desktop)
+    // Show "No results" message
+    function showNoResults(show) {
+        let noResultsMsg = document.getElementById('noResultsMessage');
+        
+        if (show) {
+            if (!noResultsMsg) {
+                noResultsMsg = document.createElement('div');
+                noResultsMsg.id = 'noResultsMessage';
+                noResultsMsg.className = 'text-center py-5';
+                noResultsMsg.innerHTML = `
+                    <div class="keep-card d-inline-block" style="max-width: 400px;">
+                        <div class="p-4">
+                            <i class="fas fa-search text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                            <h5 class="text-muted mb-2">No accounts found</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.9rem;">Try a different search term</p>
+                        </div>
+                    </div>
+                `;
+                const grid = document.getElementById('accountsGrid');
+                if (grid) {
+                    grid.parentNode.insertBefore(noResultsMsg, grid.nextSibling);
+                }
+            }
+            noResultsMsg.style.display = 'block';
+        } else {
+            if (noResultsMsg) {
+                noResultsMsg.style.display = 'none';
+            }
+        }
+    }
+    
+    // Header search
     const headerSearch = document.getElementById('headerSearch');
     if (headerSearch) {
         headerSearch.addEventListener('input', function() {
             performSearch(this.value);
-            // Sync with mobile search
-            const mobileSearch = document.getElementById('mobileSearch');
-            if (mobileSearch) mobileSearch.value = this.value;
         });
-    }
-    
-    // Mobile search
-    const mobileSearch = document.getElementById('mobileSearch');
-    if (mobileSearch) {
-        mobileSearch.addEventListener('input', function() {
-            performSearch(this.value);
-            // Sync with header search
-            const headerSearch = document.getElementById('headerSearch');
-            if (headerSearch) headerSearch.value = this.value;
-        });
-                const accountName = card.querySelector('.account-title').textContent.toLowerCase();
-                const accountInfo = card.querySelector('.account-subtitle').textContent.toLowerCase();
-                
-                if (accountName.includes(searchTerm) || accountInfo.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+        
+        // Add clear button functionality on Escape key
+        headerSearch.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                performSearch('');
+                this.blur();
+            }
         });
     }
 });
